@@ -25,18 +25,21 @@
         <h3 class="text-center ">Sign In</h3>
       </div>
       <div class="card-body">
-        <form>
+        <form method="POST" action="log.php">
           <div class="form-group">
-            <label for="exampleInputEmail1">Email address</label>
-            <input class="form-control" id="exampleInputEmail1" type="email" aria-describedby="emailHelp" placeholder="Enter email">
+            <label>Email</label>
+            <input class="form-control" type="email" placeholder="Enter email" name="email">
           </div>
           <div class="form-group">
-            <label for="exampleInputPassword1">Password</label>
-            <input class="form-control" id="exampleInputPassword1" type="password" placeholder="Password">
+            <label>Password</label>
+            <input class="form-control" type="password" placeholder="Password" name="password">
           </div>
           <center>
             <input type="submit" class="btn btn-primary btn-lg" name="signin" value="Sign In" />
           </center>
+          <div class="text-center mt-3">
+            <a href="signup.php">Register as a Tailor</a>
+          </div>
         </form>
       </div>
     </div>
@@ -46,6 +49,20 @@
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- Core plugin JavaScript-->
   <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+  <!--  Notifications Plugin    -->
+  <script src="vendor/bootstrap-notify-3/dist/bootstrap-notify.min.js"></script>
+  <?php session_start(); if (isset($_SESSION['msg'])) { $msg = $_SESSION['msg'];?>
+  <script type="text/javascript">
+      $(document).ready(function() {
+          $.notify({
+          title: "<b>Alert :</b>",
+          message: "<?= $msg?>",
+          icon: 'fa fa-bell',
+          type: "info"
+          });
+      });
+  </script>
+  <?php  unset($_SESSION['msg']); }?>
 </body>
 
 </html>
