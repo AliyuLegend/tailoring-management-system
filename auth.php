@@ -1,16 +1,14 @@
 <?php
 include 'connection.php';
 session_start();
-if (isset($_SESSION['staffid'])) {
-  $staffid = $_SESSION['staffid'];
+if (isset($_SESSION['adminid'])) {
+  $adminid = $_SESSION['adminid'];
 }else {
   echo "<script>window.open('index', '_self')</script>";
 }
 
-  $staffINFOR = $conn->query("SELECT * FROM staffs WHERE staff_id='".$staffid."' ") or die($conn->error);
-    while ($row = $staffINFOR->fetch_assoc()) {
-      $tailorid = $row['tailor_id'];
-      $role = $row['role'];
+  $adminINFOR = $conn->query("SELECT * FROM data_clark WHERE dataClark_id='".$adminid."' ") or die($conn->error);
+    while ($row = $adminINFOR->fetch_assoc()) {
       $fname = $row['firstName'];
       $lname = $row['surName'];
       $emailAddress = $row['emailAddress'];
@@ -22,18 +20,11 @@ if (isset($_SESSION['staffid'])) {
       $education = $row['education'];
       $picture = $row['picture'];
       $status = $row['status'];
-    }
-
-    $tailorINFOR = $conn->query("SELECT * FROM tailors WHERE tailor_id='".$tailorid."' ") or die($conn->error);
-    while ($row = $tailorINFOR->fetch_assoc()) {
-      $tailorid = $row['tailor_id'];
-      $staffid = $row['staff_id'];
-      $title = $row['title'];
-      $motto = $row['motto'];
-      $phone1 = $row['phoneNumber1'];
-      $phone2 = $row['phoneNumber2'];
-      $address = $row['address'];
-      $logo = $row['logo'];
-      $status = $row['status'];
+      $btitle = $row['businessTitle'];
+      $bmotto = $row['businessMotto'];
+      $bphone1 = $row['businessPhone1'];
+      $bphone2 = $row['businessPhone2'];
+      $baddress = $row['businessAddress'];
+      $blogo = $row['businessLogo'];
     }
 ?>

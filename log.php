@@ -13,15 +13,12 @@ if(isset($_POST['register'])){
   $dob = $_POST['dob'];
   $email = $_POST['email'];
   $password = md5($_POST['password']);
-  $role = 'Admin';
   $status = 1;
   // check if data exist
-  $checkEmail = $conn->query("SELECT * FROM staffs WHERE emailAddress='".$email."' ");
+  $checkEmail = $conn->query("SELECT * FROM data_clark WHERE emailAddress='".$email."' ");
   if(mysqli_num_rows($checkEmail) == 0){ 
-    $query1 = $conn->query("INSERT INTO tailors (title, phoneNumber1, phoneNumber2, address, status) VALUE('$title', '$phone1', '$phone2', '$address', '$status')") OR die($conn->error);
-    $tailorId = $conn->insert_id;
-    $query = $conn->query("INSERT INTO staffs (tailor_id, role, firstName, surName, gender, dateOfBirth, emailAddress, password, status) 
-    VALUE('$tailorId', '$role', '$fname', '$lname', '$gender', '$dob', '$email', '$password', '$status')") OR die($conn->error);
+    $query = $conn->query("INSERT INTO data_clark (firstName, surName, gender, dateOfBirth, emailAddress, password, businessTitle, businessPhone1, businessPhone2, businessAddress, status)
+    VALUE('$fname', '$lname', '$gender', '$dob', '$email', '$password', '$title', '$phone1', '$phone2', '$address', '$status')") OR die($conn->error);
     if ($query) {      
       // alert message
       $_SESSION['msg'] = 'Account created successfully.';
@@ -44,16 +41,16 @@ if(isset($_POST['signin'])){
   $username = $_POST['email'];
   $password = md5($_POST['password']);
   // verify
-  $query = $conn->query("SELECT * FROM staffs WHERE emailAddress='".$username."' and password='".$password."' and status='1'");
+  $query = $conn->query("SELECT * FROM data_clark WHERE emailAddress='".$username."' and password='".$password."' and status='1'");
   // if the record exist
   $result = mysqli_num_rows($query);
   if($result === 1) {
     // fetching user id
     while($row = $query->fetch_assoc()){
-      $staffid = $row['staff_id'];
+      $adminid = $row['dataClark_id'];
     }
     // preparing data for login
-    $_SESSION['staffid'] = $staffid;
+    $_SESSION['adminid'] = $adminid;
     echo "<script>window.open('home', '_self')</script>";
   }else{
     $_SESSION['msg'] = 'There is a problem try again later.';

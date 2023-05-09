@@ -1,6 +1,19 @@
 <?php 
 include 'auth.php';
 
+/********************
+      functions
+********************/
+function uploadPicture($target,$picname, $picture){
+  $array = explode('.', $picname);
+  $last = count($array) - 1;
+  $ext = isset($array[$last]) ? $array[$last] : 'none';
+  $original = explode('.', $picture["name"]);
+  $extension = array_pop($original);
+  move_uploaded_file($picture["tmp_name"], $target . $picname . ".".$extension);
+  $picname =   $target .$picname . ".".$extension;
+return $picname;
+}
 // update profile
 if(isset($_POST['editProfile'])){
   
@@ -22,79 +35,127 @@ if(isset($_POST['editProfile'])){
 echo "<script> window.open('profile', '_self')</script>";
 }
 
-// add level
-if(isset($_POST['addLevel'])){
-  $student = $_POST['id'];
-  $class = $_POST['class'];
-  $session = $_POST['session'];
-  $status = 1;
-  // check if data exist
-  $checkLevel = $conn->query("SELECT * FROM student_classes WHERE class_id='".$class."' ");
-  if(mysqli_num_rows($checkLevel) == 0) {
-    $query = $conn->query("INSERT INTO student_classes (student_id, class_id, session, status) 
-    VALUE('$student', '$class', '$session', '$status')") OR die($conn->error);
+/********************
+      STAFFS
+********************/ 
+// add staff
+if(isset($_POST['staffAdd'])){
+  $fname = htmlspecialchars($_POST['fname']);
+  $lname = htmlspecialchars($_POST['lname']);
+  $dob = $_POST['dob'];
+  $gender = $_POST['gender'];
+  $staffid = $_POST['staffID'];
+  $type = $_POST['type'];
+  $education = $_POST['education'];
+  $nationality = $_POST['nationality'];
+  $address = htmlspecialchars($_POST['address']);
+  // picture
+  $target = "vendor/uploads/staffs/";
+  $ran = mt_rand(0,999999999); $picname = "staff-" .$ran . time();
+  $picture = uploadPicture($target,$picname,$_FILES["picture"]);
+  // query
+  $query = $conn->query("INSERT INTO staffs (dataClark_id, firstName, surName, staffID, type, dateOfBirth, gender, nationality, address, education, picture) 
+    VALUE('$adminid', '$fname', '$lname', '$staffid', '$type', '$dob', '$gender', '$nationality', '$address', '$education', '$picture')") OR die($conn->error);
     if ($query) {
       // alert message
       $_SESSION['msg'] = 'The data has been saved';
-      echo "<script> window.open('levels', '_self')</script>";
+      echo "<script> window.open('staffs', '_self')</script>";
     }else{
       // alert message
-      $_SESSION['msg'] = 'There is problem. Try again later';
-      echo "<script> window.open('levels', '_self')</script>";
+      $_SESSION['msg'] = 'There is problem. Try again';
+      echo "<script> window.open('staff-add', '_self')</script>";
     }
-  }else{
-    $_SESSION['msg'] = 'You already enlisted this level';
-    echo "<script> window.open('levels', '_self')</script>";
-  }
 }
 
-// edit level
-if(isset($_POST['editLevel'])){
+// edit staff
+if(isset($_POST['staffEdit'])){
   $id = $_POST['id'];
-  $class = $_POST['class'];
-  $session = $_POST['session'];
-  // check if data exist
-  $checkLevel = $conn->query("UPDATE student_classes SET class_id='".$class."', session='".$session."' WHERE sclass_id='".$id."' ");
-  if($checkLevel) {
-    // alert message
-    $_SESSION['msg'] = 'The data has been updated';
-    echo "<script> window.open('levels', '_self')</script>";
+  $fname = htmlspecialchars($_POST['fname']);
+  $lname = htmlspecialchars($_POST['lname']);
+  $dob = $_POST['dob'];
+  $gender = $_POST['gender'];
+  $type = $_POST['type'];
+  $education = $_POST['education'];
+  $nationality = $_POST['nationality'];
+  $address = htmlspecialchars($_POST['address']);
+  $checkEmptyPicture = array_filter($_FILES["picture"]);
+
+  if($_FILES["picture"]['name'] !== ''){
+    // picture
+    $target = "vendor/uploads/staffs/";
+    $ran = mt_rand(0,999999999); $picname = "staff-" .$ran . time();
+    $picture = uploadPicture($target,$picname,$_FILES["picture"]);
+    // query
+    $query = $conn->query("UPDATE staffs SET firstName='$fname', surName='$lname', type='$type', dateOfBirth='$dob', gender='$gender', nationality='$nationality', address='$address', education='$education', picture='$picture' WHERE staff_id='$id'") OR die($conn->error);
   }else{
-    $_SESSION['msg'] = 'There is problem. Try again later';
-    echo "<script> window.open('levels?action=editClass&id=".$id."', '_self')</script>";
+    // query
+    $query = $conn->query("UPDATE staffs SET firstName='$fname', surName='$lname', type='$type', dateOfBirth='$dob', gender='$gender', nationality='$nationality', address='$address', education='$education' WHERE staff_id='$id'") OR die($conn->error);
   }
-  // var_dump($session);
+  if ($query) {
+      // alert message
+      $_SESSION['msg'] = 'The data has been saved';
+      echo "<script> window.open('staffs', '_self')</script>";
+    }else{
+      // alert message
+      $_SESSION['msg'] = 'There is problem. Try again';
+      echo "<script> window.open('staff-edit', '_self')</script>";
+    }
 }
 
+/********************
+      CUSTOMERS
+********************/ 
 
-// sign up
-if(isset($_POST['addCourse'])){
+// add Customer
+if(isset($_POST['customerAdd'])){
+  $name = htmlspecialchars($_POST['name']);
+  $gender = $_POST['gender'];
+  $phone = $_POST['phone'];
+  $address = htmlspecialchars($_POST['address']);
+  // query
+  $query = $conn->query("INSERT INTO customers (dataClark_id, name, gender, phoneNumber, address) 
+    VALUE('$adminid', '$name', '$gender', '$phone', '$address')") OR die($conn->error);
+    if ($query) {
+      // alert message
+      $_SESSION['msg'] = 'The data has been saved';
+      echo "<script> window.open('customers', '_self')</script>";
+    }else{
+      // alert message
+      $_SESSION['msg'] = 'There is problem. Try again';
+      echo "<script> window.open('customer-add', '_self')</script>";
+    }
+}
+
+// edit customer
+if(isset($_POST['customerEdit'])){
   $id = $_POST['id'];
-  $course = $_POST['course'];
-  $semester = $_POST['semester'];
-  $checkCourse = $conn->query("SELECT * FROM student_courses WHERE course_id='".$course."' and sclass_id='".$id."' and semester='".$semester."' ");
-  if(mysqli_num_rows($checkCourse) == 0){ 
-    $conn->query("INSERT INTO student_courses (student_id, sclass_id, course_id, semester, status) 
-    VALUE('$studentid', '$id', '$course', '$semester', '1')") OR die($conn->error);
-  
-    $_SESSION['msg'] = 'You registered a course successfully.';
-    echo "<script> window.open('levels?action=showClass&id=".$id."', '_self')</script>";
-  }else{
-    $_SESSION['msg'] = 'The course is already registered.';
-    echo "<script> window.open('levels?action=showClass&id=".$id."', '_self')</script>";
-  }
+  $name = htmlspecialchars($_POST['name']);
+  $gender = $_POST['gender'];
+  $phone = $_POST['phone'];
+  $address = htmlspecialchars($_POST['address']);
+  // query
+  $query = $conn->query("UPDATE customers SET name='$name', gender='$gender', phoneNumber='$phone', address='$address' WHERE customer_id='$id'") OR die($conn->error);
+  if ($query) {
+      // alert message
+      $_SESSION['msg'] = 'The data has been saved';
+      echo "<script> window.open('customers', '_self')</script>";
+    }else{
+      // alert message
+      $_SESSION['msg'] = 'There is problem. Try again';
+      echo "<script> window.open('customer-edit', '_self')</script>";
+    }
 }
 
 // actions using anchor
 if(!empty($_GET['action'])){
   switch ($_GET['action']) {
     // class
-    case 'DeleteClass':
+    case 'DeleteStaff':
         $id = $_GET['id'];
-        $column = 'sclass_id'; $table = 'student_classes';
+        $column = 'staff_id'; $table = 'staffs';
         $process = $conn->query("DELETE FROM $table WHERE $column='".$id."'") or die($conn->error);
         $_SESSION['msg'] = 'You delete data successfully.';
-        header("Location:levels");
+        echo "<script> window.open('staffs', '_self')</script>";
         break;
 
     // course
@@ -109,35 +170,4 @@ if(!empty($_GET['action'])){
   }
 }
 
-// add request
-if(isset($_POST['request'])){
-  $studentid = $_POST['id'];
-  $reg = $_POST['reg'];
-  $fname = $_POST['fname'];
-  $lname = $_POST['lname'];
-  $gender = $_POST['gender'];
-  $dob = $_POST['dob'];
-  $marital = $_POST['marital'];
-  $phone = $_POST['phone'];
-  $state = $_POST['state'];
-  $course = $_POST['course'];
-  $class = $_POST['class'];
-  $gdate = $_POST['gdate'];
-  $jamb = $_POST['jambrn'];
-  $cjamb = $_POST['cjambrn'];
-  $serve = $_POST['serve'];
-  $militry = $_POST['militry'];
-  $status = 1;
-  $checkRequest = $conn->query("SELECT * FROM requests WHERE student_id='".$studentid."' and status=1 ");
-  if(mysqli_num_rows($checkRequest) == 0){ 
-    $conn->query("INSERT INTO requests (student_id, reg, fname, lname, gender, dob, marital, phone, state, course, class, gdate, jamb, cjamb, serve, militry, status) 
-    VALUE('$studentid', '$reg', '$fname', '$lname', '$gender', '$dob', '$marital', '$phone', '$state', '$course', '$class', '$gdate', '$jamb', '$cjamb', '$serve', '$militry', '1')") OR die($conn->error);
-  
-    $_SESSION['msg'] = 'Your request has been sent successfully.';
-    echo "<script> window.open('status', '_self')</script>";
-  }else{
-    $_SESSION['msg'] = 'You already sent a request.';
-    echo "<script> window.open('request', '_self')</script>";
-  }
-}
 ?>
